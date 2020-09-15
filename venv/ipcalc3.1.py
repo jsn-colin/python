@@ -23,7 +23,7 @@ import re
 import sys
 
 
-Version = 3.1
+VERSION = 3.1
 
 
 def check_ip(ip):
@@ -35,12 +35,12 @@ def check_ip(ip):
         return False
 
 
-def Ip2cov10(BinIp):
+def ip2cov10(binip):
     # 32位数字切割
-    binip1 = BinIp[0:8]
-    binip2 = BinIp[8:16]
-    binip3 = BinIp[16:24]
-    binip4 = BinIp[24:]
+    binip1 = binip[0:8]
+    binip2 = binip[8:16]
+    binip3 = binip[16:24]
+    binip4 = binip[24:]
 
     # 将二进制转为10进制
     decip1 = str(int(binip1, 2))
@@ -52,9 +52,9 @@ def Ip2cov10(BinIp):
     return decip
 
 
-def net2ip(IP, MASK):
+def net2ip(ip, mask):
     """将网段转换为IP地址"""
-    p1, p2, p3, p4 = IP.split('.')
+    p1, p2, p3, p4 = ip.split('.')
 
     # 将ip四段转化为二进制
     pb1 = '{:08b}'.format(int(p1))
@@ -64,30 +64,30 @@ def net2ip(IP, MASK):
     pb = pb1 + pb2 + pb3 + pb4
 
     # 网络位
-    NetBit = pb[0:int(MASK)]
+    netbit = pb[0:int(mask)]
 
     # 主机位该补充的0和1
-    uMask = int(32 - int(MASK))
-    sup0 = '0' * uMask
-    sup1 = '1' * uMask
+    umask = int(32 - int(mask))
+    sup0 = '0' * umask
+    sup1 = '1' * umask
 
     # 网络地址 = 网络位 + 补充0的个数 ；广播地址 = 网络位 + 补充的1的个数
-    NetBitComp = NetBit + sup0  # 网络地址
-    HostBitComp = NetBit + sup1  # 广播地址
+    net_bit_comp = netbit + sup0  # 网络地址
+    host_bit_comp = netbit + sup1  # 广播地址
 
     # 将二进制的网络地址和广播地址转化为ip格式
-    NetDec = Ip2cov10(NetBitComp)
-    HostDec = Ip2cov10(HostBitComp)
+    net_dec = ip2cov10(net_bit_comp)
+    host_dec = ip2cov10(host_bit_comp)
 
-    print("%s --- %s" % (NetDec, HostDec))
-    print("二进制网络地址： %s " % NetBitComp)
-    print("二进制广播地址： %s " % HostBitComp)
+    print("%s --- %s" % (net_dec, host_dec))
+    print("二进制网络地址： %s " % net_bit_comp)
+    print("二进制广播地址： %s " % host_bit_comp)
 
 
-def net2ip2(IP, MASK):
+def net2ip2(ip, mask):
     """将网段转换为IP地址"""
-    if IP is not None:
-        p1, p2, p3, p4 = IP.split('.')
+    if ip is not None:
+        p1, p2, p3, p4 = ip.split('.')
 
         # 将ip四段转化为二进制
         pb1 = '{:08b}'.format(int(p1))
@@ -97,22 +97,22 @@ def net2ip2(IP, MASK):
         pb = pb1 + pb2 + pb3 + pb4
 
         # 网络位，主机位
-        NetBit = pb[0:int(MASK)]
+        netbit = pb[0:int(mask)]
 
         # 主机位该补充的0和1
-        uMask = int(32 - int(MASK))
-        sup0 = '0' * uMask
-        sup1 = '1' * uMask
+        umask = int(32 - int(mask))
+        sup0 = '0' * umask
+        sup1 = '1' * umask
 
         # 网络地址 = 网络位 + 补充0的个数 ；广播地址 = 网络位 + 补充的1的个数
-        NetBitComp = NetBit + sup0  # 网络地址
-        HostBitComp = NetBit + sup1  # 广播地址
+        net_bit_comp = netbit + sup0  # 网络地址
+        host_bit_comp = netbit + sup1  # 广播地址
 
         # 将二进制的网络地址和广播地址转化为ip格式
-        NetDec = Ip2cov10(NetBitComp)
-        HostDec = Ip2cov10(HostBitComp)
+        net_dec = ip2cov10(net_bit_comp)
+        host_dec = ip2cov10(host_bit_comp)
 
-        return NetDec, HostDec
+        return net_dec, host_dec
     else:
         exit(1)
 
@@ -152,29 +152,28 @@ def numcovip(num_addr):
         print("%d is error" % num_addr)
 
 
-def excute_proc(IPStart, IPStop):
-    for Mask in range(1, 33):
-        IP1, IP2 = net2ip2(IPStart, Mask)
-        if IP1 == IPStart:
-            if ipcovnum(IP2) <= ipcovnum(IPStop):
+def excute_proc(ipstart, ipstop):
+    for mask in range(1, 33):
+        ip1, ip2 = net2ip2(ipstart, mask)
+        if ip1 == ipstart:
+            if ipcovnum(ip2) <= ipcovnum(ipstop):
 
-                ret = (IPStart, Mask)
+                ret = (ipstart, mask)
                 # print(result)
                 return ret
 
-            elif ipcovnum(IP2) == ipcovnum(IPStop):
+            elif ipcovnum(ip2) == ipcovnum(ipstop):
                 break
 
 
-def inter_proc(IPBegin, IPEnd):
+def inter_proc(ipbegin, ipend):
     results = list()
     while True:
-        # IPList == [IPBegin, Mask]
-        IPList = excute_proc(IPBegin, IPEnd)
-        if IPList:
-            IP1, IP2 = net2ip2(IPList[0], IPList[1])
-            IPBegin = numcovip(ipcovnum(IP2) + 1)
-            results.append(IPList)
+        iplist = excute_proc(ipbegin, ipend)
+        if iplist:
+            ip1, ip2 = net2ip2(iplist[0], iplist[1])
+            ipbegin = numcovip(ipcovnum(ip2) + 1)
+            results.append(iplist)
 
         else:
             break
@@ -183,17 +182,16 @@ def inter_proc(IPBegin, IPEnd):
 
 def main():
     """手工执行 计算网段中的 网络位和广播位"""
-    NET = input('请输入网段（ip/mask）[Q/q]:退出： ')
-    if NET == 'q' or NET == 'quit' or NET == 'Q':
+    net = input('请输入网段（ip/mask）[Q/q]:退出： ')
+    if net == 'q' or net == 'quit' or net == 'Q':
         sys.exit(1)
     else:
-        # noinspection PyBroadException
         try:
-            IP, MASK = NET.split('/')
-            if check_ip(IP):  # 判断ip是否合法
+            ip, mask = net.split('/')
+            if check_ip(ip):  # 判断ip是否合法
 
-                if 32 >= int(MASK) >= 1:  # 判断掩码是否合法
-                    net2ip(IP, MASK)
+                if 32 >= int(mask) >= 1:  # 判断掩码是否合法
+                    net2ip(ip, mask)
 
                 else:
                     print('子网掩码地址不合规')
@@ -203,17 +201,17 @@ def main():
             print("输入格式为：ip/mask，例如：192.168.10.10/24")
 
 
-def main2(NET):
+def main2(net):
     """指定文件 计算网段的 网络为和广播位"""
-    IP, MASK = NET.split("/")
-    if check_ip(IP):  # 判断ip是否合法
-        if 32 >= int(MASK) >= 1:  # 判断掩码是否合法
-            netpool = net2ip2(IP, MASK)
-            return NET[:-1] + " --> " + netpool[0] + "--" + netpool[1]
+    ip, mask = net.split("/")
+    if check_ip(ip):  # 判断ip是否合法
+        if 32 >= int(mask) >= 1:  # 判断掩码是否合法
+            netpool = net2ip2(ip, mask)
+            return net[:-1] + " --> " + netpool[0] + "--" + netpool[1]
         else:
-            return NET[:-1] + " --> " + "子网掩码不合规"
+            return net[:-1] + " --> " + "子网掩码不合规"
     else:
-        return NET[:-1] + " --> " + "ip地址不合规"
+        return net[:-1] + " --> " + "ip地址不合规"
 
 
 def main3(ip_start, ip_end):
@@ -242,25 +240,25 @@ def main3_1(ip_range):
     返回[('192.168.1.1', 32), ('192.168.1.2', 31), ('192.168.1.4', 30), ('192.168.1.8', 31)]
     """
 
-    IPStart, IPStop = ip_range.split(',')
+    ipstart, ipstop = ip_range.split(',')
     # 判断 起始IP地址合法性
-    if check_ip(IPStart):
+    if check_ip(ipstart):
         # 判断 结束ip合法性
-        if check_ip(IPStop):
+        if check_ip(ipstop):
             # 计算 进程会返回 一个ip段的列表
-            ret = inter_proc(IPStart, IPStop)
+            ret = inter_proc(ipstart, ipstop)
             return ret
         else:
             # 结束ip 不合法
-            print("%s is error" % IPStop)
+            print("%s is error" % ipstop)
     else:
         # 起始ip 不合法
-        print("%s is error" % IPStart)
+        print("%s is error" % ipstart)
 
 
 def Usage():
 
-    print("Version:%s" % Version)
+    print("Vnersio:%s" % VERSION)
     print()
     print("Example:")
 
