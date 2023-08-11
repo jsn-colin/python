@@ -12,3 +12,9 @@ python3脚本，用于计算IP地址段
 
 # check_port
 tcp端口检测的脚本
+
+# passwrddict
+根据关键字生成密码字典
+
+# wificrack
+使用字典暴力跑wifi密码
