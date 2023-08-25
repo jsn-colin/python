@@ -48,7 +48,7 @@ class StrCryption:
         else:
             raise "CODEMAP error"
 
-    def encode(self, content):
+    def enryption(self, content):
         """加密的字符串需要是utf-8编码，解密同样"""
         content = str(content)
         bs64str = base64.b64encode(content.encode('utf-8')).decode('utf-8')
@@ -72,7 +72,7 @@ class StrCryption:
         #print("crycode:", crycode)
         return crycode
 
-    def decode(self, crycode):
+    def decryption(self, crycode):
         # key的数字
         keyord = cycle(self.keyord)
 
@@ -142,7 +142,7 @@ class BinCryption:
         else:
             raise "CODEMAP error"
 
-    def encode(self, content):
+    def encryption(self, content):
         """加密的字符串需要是utf-8编码，解密同样"""
         #bs64str = base64.b64encode(content.encode('utf-8')).decode('utf-8')
         bs64str = base64.b64encode(content)
@@ -164,7 +164,7 @@ class BinCryption:
 
         return crycode
 
-    def decode(self, crycode):
+    def decryiption(self, crycode):
         # key的数字
         keyord = cycle(self.keyord)
 
