@@ -1,0 +1,70 @@
+import os
+import string
+from openpyxl import Workbook, load_workbook
+from openpyxl.utils import column_index_from_string
+
+def write_xlsx(header: list, data: list, file_name: str = "sample.xlsx", sheet_name: str = "Sheet1"):
+    """
+    用来将数据写入的xlsx文件中，header是表头，data是数据，file_name是文件名,sheet_name是sheet名
+    """
+    if os.path.exists(file_name):
+        print("文件存在，打开文件")
+        wb = load_workbook(file_name)
+    else:
+        print(f"文件不存在，创建文件: {file_name}")
+        wb = Workbook()
+
+    if sheet_name not in wb.sheetnames:
+        ws = wb.create_sheet(sheet_name)
+        print(f"sheet不存在，创建sheet: {sheet_name}")
+    else:
+        ws = wb[sheet_name]
+        print(f"sheet存在，打开sheet: {sheet_name}")
+
+    for i, header_item in enumerate(header):
+        col = string.ascii_uppercase[i]  # 获取列字母
+        cell_reference = f"{col}1"  # 拼接成类似"A1"的格式
+        ws[cell_reference] = header_item
+
+    for line in data:
+        ws.append(line)
+
+    wb.save(file_name)
+
+
+def read_xlsx(file_name: str, sheet_name: str = 'Sheet1', columns: tuple = None) -> list:
+    """
+    用来读取xlsx文件，返回一个列表，列表中每个元素是一个元组，元组中包含每一行的数据
+    """
+    try:
+        wb = load_workbook(file_name)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"File '{file_name}' not found.")
+    
+    if sheet_name not in wb.sheetnames:
+        raise ValueError(f"Sheet '{sheet_name}' not found in the workbook.")
+    
+    ws = wb[sheet_name]
+    data = []
+
+    if columns is None:
+        for line in ws.iter_rows(values_only=True):
+            data.append(list(line))
+    else:
+        for row in ws.iter_rows(values_only=True):
+            row_data = [
+                row[column_index_from_string(col) - 1] 
+                if len(row) > column_index_from_string(col) - 1 
+                else None
+                for col in columns
+            ]
+            data.append(row_data)
+    
+    return data
+
+
+def main():
+    print("hello")
+
+if __name__ == "__main__":
+    main()
