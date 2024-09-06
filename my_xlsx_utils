@@ -8,18 +8,18 @@ def write_xlsx(header: list, data: list, file_name: str = "sample.xlsx", sheet_n
     用来将数据写入的xlsx文件中，header是表头，data是数据，file_name是文件名,sheet_name是sheet名
     """
     if os.path.exists(file_name):
-        print("文件存在，打开文件")
+        # print("文件存在，打开文件")
         wb = load_workbook(file_name)
     else:
-        print(f"文件不存在，创建文件: {file_name}")
+        # print(f"文件不存在，创建文件: {file_name}")
         wb = Workbook()
 
     if sheet_name not in wb.sheetnames:
         ws = wb.create_sheet(sheet_name)
-        print(f"sheet不存在，创建sheet: {sheet_name}")
+        # print(f"sheet不存在，创建sheet: {sheet_name}")
     else:
         ws = wb[sheet_name]
-        print(f"sheet存在，打开sheet: {sheet_name}")
+        # print(f"sheet存在，打开sheet: {sheet_name}")
 
     for i, header_item in enumerate(header):
         col = string.ascii_uppercase[i]  # 获取列字母
@@ -32,7 +32,7 @@ def write_xlsx(header: list, data: list, file_name: str = "sample.xlsx", sheet_n
     wb.save(file_name)
 
 
-def read_xlsx(file_name: str, sheet_name: str = 'Sheet1', columns: tuple = None) -> list:
+def read_xlsx(file_name: str, sheet_name: str = 'Sheet1', header: tuple = None, columns: tuple = None) -> list:
     """
     用来读取xlsx文件，返回一个列表，列表中每个元素是一个元组，元组中包含每一行的数据
     """
@@ -45,20 +45,39 @@ def read_xlsx(file_name: str, sheet_name: str = 'Sheet1', columns: tuple = None)
         raise ValueError(f"Sheet '{sheet_name}' not found in the workbook.")
     
     ws = wb[sheet_name]
-    data = []
+    data = list()
+    # 判断header,如果有header就可以把传进来的header里面的元素提取出来，作为columns, header是表格的第一行表头(例如：("序号","姓名","年龄")数据类型: 元组)
+    if header is not None:
+        xlsx_header = [cell.value for cell in next(ws.iter_rows(min_row=1, max_row=1))]
+        columns = list()
+        for head in header:
+            columns.append(string.ascii_uppercase[xlsx_header.index(head)])
 
-    if columns is None:
-        for line in ws.iter_rows(values_only=True):
-            data.append(list(line))
-    else:
-        for row in ws.iter_rows(values_only=True):
-            row_data = [
-                row[column_index_from_string(col) - 1] 
-                if len(row) > column_index_from_string(col) - 1 
+        for line in ws.iter_rows(min_row=2, values_only=True):
+            line_data = [
+                line[column_index_from_string(col) - 1] 
+                if len(line) > column_index_from_string(col) - 1 
                 else None
                 for col in columns
             ]
-            data.append(row_data)
+            data.append(line_data)
+    # 如果没有传入header,再看有没有传入columns，columns是表格中需要读取的列名(例如：("A","B","C")数据类型: 元组)
+    else:
+        # 如果cloumns 有值，就只读取指定的列
+        if columns is not None:
+            for row in ws.iter_rows(values_only=True):
+                line_data = [
+                    row[column_index_from_string(col) - 1] 
+                    if len(row) > column_index_from_string(col) - 1 
+                    else None
+                    for col in columns
+                ]
+                data.append(line_data)
+        # 如果columns 没有值，就读取所有列
+        else:
+            for line in ws.iter_rows(values_only=True):
+                data.append(list(line))
+
     
     return data
 
