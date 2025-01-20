@@ -9,6 +9,7 @@
 
 import re
 import sys
+import os
 import signal
 import socket
 import chardet
@@ -27,7 +28,7 @@ parser.add_argument('-s', '--server', dest='server', help='指定目的地址 (�
 parser.add_argument('-f', '--file', dest='file', help='指定文件路径 (一行一条记录，格式 "192.168.1.1:80")')
 parser.add_argument('-p', '--port', dest='port', type=int, help='指定端口 1-65535')
 parser.add_argument('-t', '--timeout', dest='timeout', default=3, type=int, help='指定超时时间，默认：3s')
-parser.add_argument('-P', '--process', dest='process_pool', default='1', type=int, help='进程池数量，默认：单进程')
+parser.add_argument('-P', '--process', dest='process_pool', default=os.cpu_count(), type=int, help='进程池数量，默认：单进程')
 parser.add_argument('-W', '--width', dest='width', default=35, type=int, help='对齐宽度，默认：35')
 args = parser.parse_args()
 
