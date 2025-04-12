@@ -1,3 +1,4 @@
+#!/bin/env python3
 # _*_coding:utf-8_*_
 
 
@@ -18,12 +19,16 @@
 # 新增 -abf 参数， a = all 使 -bf 可以对任意非标准的地址聚合成多个地址段
 # -bf 针对 “网络位,广播位”，只能聚合成一个标准网段  -abf 针对“起始IP,结束IP” 聚合成多个标准的地址段
 
+# 2025/04/13
+# Version：3.2
+# 优化代码，统一风格，支持codon编译及运行
+
 
 import re
 import sys
 
 
-VERSION = 3.1
+VERSION = 3.2
 
 
 def check_ip(ip):
@@ -57,10 +62,11 @@ def net2ip(ip, mask):
     p1, p2, p3, p4 = ip.split('.')
 
     # 将ip四段转化为二进制
-    pb1 = '{:08b}'.format(int(p1))
-    pb2 = '{:08b}'.format(int(p2))
-    pb3 = '{:08b}'.format(int(p3))
-    pb4 = '{:08b}'.format(int(p4))
+    #pb1 = '{:08b}'.format(int(p1))
+    pb1 = f"{int(p1):b}"
+    pb2 = f"{int(p2):b}"
+    pb3 = f"{int(p3):b}"
+    pb4 = f"{int(p4):b}"
     pb = pb1 + pb2 + pb3 + pb4
 
     # 网络位
@@ -79,9 +85,9 @@ def net2ip(ip, mask):
     net_dec = ip2cov10(net_bit_comp)
     host_dec = ip2cov10(host_bit_comp)
 
-    print("%s --- %s" % (net_dec, host_dec))
-    print("二进制网络地址： %s " % net_bit_comp)
-    print("二进制广播地址： %s " % host_bit_comp)
+    print(f"{net_dec} --- {host_dec}")
+    print(f"二进制网络地址： {net_bit_comp}")
+    print(f"二进制广播地址： {host_bit_comp}")
 
 
 def net2ip2(ip, mask):
@@ -90,10 +96,10 @@ def net2ip2(ip, mask):
         p1, p2, p3, p4 = ip.split('.')
 
         # 将ip四段转化为二进制
-        pb1 = '{:08b}'.format(int(p1))
-        pb2 = '{:08b}'.format(int(p2))
-        pb3 = '{:08b}'.format(int(p3))
-        pb4 = '{:08b}'.format(int(p4))
+        pb1 = f"{int(p1):b}"
+        pb2 = f"{int(p2):b}"
+        pb3 = f"{int(p3):b}"
+        pb4 = f"{int(p4):b}"
         pb = pb1 + pb2 + pb3 + pb4
 
         # 网络位，主机位
@@ -114,7 +120,7 @@ def net2ip2(ip, mask):
 
         return net_dec, host_dec
     else:
-        exit(1)
+        sys.exit(1)
 
 
 def ipcovnum(ip_addr):
@@ -132,7 +138,7 @@ def ipcovnum(ip_addr):
         return pnum
 
     else:
-        print("%s is error" % ip_addr)
+        print(f"{ip_addr} is error")
 
 
 def numcovip(num_addr):
@@ -149,7 +155,7 @@ def numcovip(num_addr):
         return ip
 
     else:
-        print("%d is error" % num_addr)
+        print(f"{num_addr} is error")
 
 
 def excute_proc(ipstart, ipstop):
@@ -170,7 +176,7 @@ def inter_proc(ipbegin, ipend):
     results = list()
     while True:
         iplist = excute_proc(ipbegin, ipend)
-        if iplist:
+        if iplist is not None:
             ip1, ip2 = net2ip2(iplist[0], iplist[1])
             ipbegin = numcovip(ipcovnum(ip2) + 1)
             results.append(iplist)
@@ -226,7 +232,7 @@ def main3(ip_start, ip_end):
             for num in range(32):
                 if ret == 2 ** num:
                     mask = 32 - num
-                    return "%s/%d" % (ip_start, mask)
+                    return f"{ip_start}/{mask}"
 
         else:
             return ip_end + "-->" + "地址不合法"
@@ -250,15 +256,15 @@ def main3_1(ip_range):
             return ret
         else:
             # 结束ip 不合法
-            print("%s is error" % ipstop)
+            print("{ipstop} is error")
     else:
         # 起始ip 不合法
-        print("%s is error" % ipstart)
+        print("{ipstart} is error")
 
 
 def Usage():
 
-    print("Vnersio:%s" % VERSION)
+    print("Vnersio: {VERSION}")
     print()
     print("Example:")
 
@@ -286,9 +292,9 @@ if __name__ == '__main__':
             result = main3(ips, ipe)
             # print(result)
             if result:
-                print("%s,%s -- %s" % (ips, ipe.strip('\n'), result))
+                print(f"{ips},{ipe}.strip('\n') -- {result}")
             else:
-                print("%s,%s -- None" % (ips, ipe.strip('\n')))
+                print(f"{ips},{ipe}.strip('\n') -- None")
 
     elif sys.argv[1] == '-abf':
         for lines in open(sys.argv[2]):
@@ -300,7 +306,7 @@ if __name__ == '__main__':
 
                 ret1.append(j)
             # ret1 是转换过格式的ret
-            print("%s -- %s" % (lines.strip("\n"), ret1))
+            print(f"{lines}.strip('\n') -- {ret1}")
 
     else:
         Usage()
