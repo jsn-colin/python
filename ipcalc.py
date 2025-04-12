@@ -60,7 +60,6 @@ def ip2cov10(binip):
 def net2ip(ip, mask):
     """将网段转换为IP地址"""
     p1, p2, p3, p4 = ip.split('.')
-
     # 将ip四段转化为二进制
     #pb1 = '{:08b}'.format(int(p1))
     pb1 = f"{int(p1):b}"
@@ -94,7 +93,6 @@ def net2ip2(ip, mask):
     """将网段转换为IP地址"""
     if ip is not None:
         p1, p2, p3, p4 = ip.split('.')
-
         # 将ip四段转化为二进制
         pb1 = f"{int(p1):b}"
         pb2 = f"{int(p2):b}"
@@ -125,9 +123,7 @@ def net2ip2(ip, mask):
 
 def ipcovnum(ip_addr):
     check_result = check_ip(ip_addr)
-
     if check_result:
-
         p1, p2, p3, p4 = ip_addr.split(".")
         p1 = int(p1) * (256 ** 3)
         p2 = int(p2) * (256 ** 2)
@@ -153,7 +149,6 @@ def numcovip(num_addr):
 
         ip = str(nip1) + '.' + str(nip2) + '.' + str(nip3) + '.' + str(nip)
         return ip
-
     else:
         print(f"{num_addr} is error")
 
@@ -163,11 +158,9 @@ def excute_proc(ipstart, ipstop):
         ip1, ip2 = net2ip2(ipstart, mask)
         if ip1 == ipstart:
             if ipcovnum(ip2) <= ipcovnum(ipstop):
-
                 ret = (ipstart, mask)
                 # print(result)
                 return ret
-
             elif ipcovnum(ip2) == ipcovnum(ipstop):
                 break
 
@@ -180,7 +173,6 @@ def inter_proc(ipbegin, ipend):
             ip1, ip2 = net2ip2(iplist[0], iplist[1])
             ipbegin = numcovip(ipcovnum(ip2) + 1)
             results.append(iplist)
-
         else:
             break
     return results
@@ -195,10 +187,8 @@ def main():
         try:
             ip, mask = net.split('/')
             if check_ip(ip):  # 判断ip是否合法
-
                 if 32 >= int(mask) >= 1:  # 判断掩码是否合法
                     net2ip(ip, mask)
-
                 else:
                     print('子网掩码地址不合规')
             else:
@@ -226,14 +216,11 @@ def main3(ip_start, ip_end):
         if check_ip(ip_end):
             ip2 = ipcovnum(ip_end)
             ip1 = ipcovnum(ip_start)
-
             ret = ip2 - ip1 + 1
-
             for num in range(32):
                 if ret == 2 ** num:
                     mask = 32 - num
                     return f"{ip_start}/{mask}"
-
         else:
             return ip_end + "-->" + "地址不合法"
     else:
@@ -263,11 +250,8 @@ def main3_1(ip_range):
 
 
 def Usage():
-
-    print("Vnersio: {VERSION}")
-    print()
+    print("Vnersio: {VERSION}", end='\n')
     print("Example:")
-
     print("\t执行:\t" + sys.argv[0] + "\t\t（手动输入网段，打印出: '网络位 -- 广播位'）")
     print("\t执行:\t" + sys.argv[0] + ' -f file ' + "\t（-f 指定文件， 打印出: '网络位 -- 广播位'）")
     print("\t执行:\t" + sys.argv[0] + ' -bf file ' + "\t（-b 反向，根据'网络位,广播位'   聚合成网段）")
@@ -303,10 +287,8 @@ if __name__ == '__main__':
             ret1 = list()
             for i in result:
                 j = i[0] + "/" + str(i[1])
-
                 ret1.append(j)
             # ret1 是转换过格式的ret
             print(f"{lines}.strip('\n') -- {ret1}")
-
     else:
         Usage()
