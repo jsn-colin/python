@@ -13,7 +13,8 @@ def ipv4_aggregator(start_ip, end_ip):
     cur_ip = start_ip
     ip_ret = list()
     while True:
-        mask = 32 - ip_num.bit_length() + 1
+        # mask = 32 - ip_num.bit_length() + 1 # 这种方法可行，但是codon不支持，另外如果使用codon build ipcalc.py，开头的from ip import IPV4,需要改成直接把IPV4类拷贝到文件的开头
+        mask = 35 - len(bin(ip_num)) 
         for cmask in range(mask, 33, 1):
             cip = IPV4(cur_ip + '/' + str(cmask))
             if cip.ip_network == cur_ip:
