@@ -60,8 +60,11 @@ class IPV4:
     @property
     def ip_broadcast(self):
         return self._bin_to_ip(self.ip_bin_broadcast)
-
-
+        
+    @property
+    def ip_count(self):
+        return int(self.ip_bin_broadcast, 2) - int(self.ip_bin_network, 2) + 1
+        
 # 使用
 if __name__ == '__main__':
     import sys
@@ -77,3 +80,4 @@ if __name__ == '__main__':
     print(f'二进制网络：{ip.ip_bin_network}')
     print(f'二进制广播：{ip.ip_bin_broadcast}')
     print(f'ip十进制是：{ip.ip_int}')
+    print(f'网段拥有的ip地址数是：{ip.ip_count}')
