@@ -7,7 +7,7 @@ def ipv4_aggregator(start_ip, end_ip):
     eip = IPV4(end_ip)
 
     # 包含多少个ip, 这个数字一定是大于1的数据，否则起始ip大于结束ip
-    ip_num = eip.ip_int - sip.ip_int + 1
+    ip_num = eip.ip_dec - sip.ip_dec + 1
     if ip_num < 1:
         raise ValueError("起始 IP 不能大于结束 IP")
     cur_ip = start_ip
@@ -17,12 +17,12 @@ def ipv4_aggregator(start_ip, end_ip):
         mask = 35 - len(bin(ip_num)) 
         for cmask in range(mask, 33, 1):
             cip = IPV4(cur_ip + '/' + str(cmask))
-            if cip.ip_network == cur_ip:
+            if cip.network == cur_ip:
                 ip_ret.append(cur_ip + '/' + str(cmask))
-                broadcast_int = int(cip.ip_bin_broadcast, 2)
+                broadcast_int = int(cip.broadcast_bin, 2)
                 next_ip   = '.'.join(str((broadcast_int + 1 >> i) & 0xFF) for i in (24, 16, 8, 0))
                 cur_ip = next_ip
-                ip_num = ip_num - cip.ip_count
+                ip_num = ip_num - cip.count
                 found = True # 只要for循环中找到一个就是true
                 if ip_num <= 0:
                     return ip_ret
@@ -48,12 +48,12 @@ def main():
                     ip = IPV4(ip_str)
                     print(f'ip地址是：{ip.ip}')
                     print(f'ip掩码是：{ip.mask}')
-                    print(f'ip网络是：{ip.ip_network}')
-                    print(f'ip广播是：{ip.ip_broadcast}')
-                    print(f'二进制网络：{ip.ip_bin_network}')
-                    print(f'二进制广播：{ip.ip_bin_broadcast}')
-                    print(f'ip十进制是：{ip.ip_int}')
-                    print(f'网段拥有的ip地址数是：{ip.ip_count}')
+                    print(f'ip网络是：{ip.network}')
+                    print(f'ip广播是：{ip.broadcast}')
+                    print(f'二进制网络：{ip.network_bin}')
+                    print(f'二进制广播：{ip.broadcast_bin}')
+                    print(f'ip十进制是：{ip.ip_dec}')
+                    print(f'网段拥有的ip地址数是：{ip.count}')
                 except ValueError:
                     print('输入错误，重新输入')
                     
@@ -66,12 +66,12 @@ def main():
                         ip = IPV4(line)
                         print(f'ip地址是：{ip.ip}')
                         print(f'ip掩码是：{ip.mask}')
-                        print(f'ip网络是：{ip.ip_network}')
-                        print(f'ip广播是：{ip.ip_broadcast}')
-                        print(f'二进制网络：{ip.ip_bin_network}')
-                        print(f'二进制广播：{ip.ip_bin_broadcast}')
-                        print(f'ip十进制是：{ip.ip_int}')
-                        print(f'网段拥有的ip地址数是：{ip.ip_count}')
+                        print(f'ip网络是：{ip.network}')
+                        print(f'ip广播是：{ip.broadcast}')
+                        print(f'二进制网络：{ip.network_bin}')
+                        print(f'二进制广播：{ip.broadcast_bin}')
+                        print(f'ip十进制是：{ip.ip_dec}')
+                        print(f'网段拥有的ip地址数是：{ip.count}')
         except Exception as e:
             print(f"错误：文件 {sys.argv[2]} 打开错误", e)
             sys.exit(1)
